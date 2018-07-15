@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>绝地求生</title>
+	<style type="text/css">
+		ul,li{list-style: none;}
+		*{margin: 0}
+		header{position: fixed; top: 0; left: 0; background-color: #333;
+			height: 30px; width: 100%; z-index: 999; display: flex;}
+		header .nav_box{width: 40%;}
+		header .nav_box ul{display: flex;}
+		header .nav_box ul li{flex: auto;}
+		header a{color: #fff;}
+		.first_box{margin-top: 30px;}
+		/*全屏*/
+		body{height: 100%; overflow: hidden;}
+		.container{transform: translate(0,0); transition: all 1s;}
+		video{width: 100%; display: block}
+		.sprite{background: url("sprite.png");}
+		.first_box{position: relative;}
+		.second_box{position: relative;}
+		.first_box .first_bg{position: absolute; height: 237px; width: 778px; 
+			bottom: 186px; left: 29%; background-position: 0px -83px;}
+		.second_box .first_bg{position: absolute; height: 176px; width: 374px; 
+			bottom: 186px; left: 41%; background-position: -376px -507px;}
+		.left_nav{background: url(bg_nav.png); position: absolute; left: 0; 
+			top: 40px; width: 42px; height: 936px; z-index: 99;}
+		.nav_content{color: #fff}
+		.nav_content li{position: absolute; left: 31px; width: 100px;}
+		.nav_content li:nth-child(1){top: 49px;}
+		.nav_content li:nth-child(2){top: 254px;}
+		.nav_content li:nth-child(3){top: 459px;}
+	</style>
+</head>
+<body>
+	<header>
+		<div class="logo_box"></div>
+		<div class="nav_box">
+			<ul>
+				<li>
+					<a href="">首页</a>
+				</li>
+				<li>
+					<a href="">2</a>
+				</li>
+				<li>
+					<a href="">3</a>
+				</li>
+				<li>
+					<a href="">4</a>
+				</li>
+			</ul>
+		</div>
+		<div class="button_box"></div>
+	</header>
+	
+	<div class="left_nav">
+		<ul class="nav_content">
+			<li onclick="changeTo(0)">第一个</li>
+			<li onclick="changeTo(1)">第二个</li>
+			<li onclick="changeTo(2)">第三个</li>
+		</ul>
+	</div>
+
+	<div class="container">
+		
+		<div class="first_box">
+			<video style="width: 100%" src="first.mp4" autoplay="" loop=""></video>
+			<p class="first_bg sprite">
+				
+			</p>
+		</div>
+		<div class="second_box">
+			<video src="wyf.mp4" loop=""></video>
+			<p class="first_bg sprite">
+				
+			</p>
+		</div>
+		<div class="three_box">
+			<video src="girl.mp4" loop=""></video>
+		</div>
+	</div>
+	
+	<script type="text/javascript">
+		var index = 0;  // 定义显示的是第几个视频
+		// 找到所有的视频盒子
+		var video_boxes = document.querySelectorAll(".container > div");
+		// console.log(video_boxes);
+		//有多少个视频盒子
+		var box_length = video_boxes.length-1;
+
+		/*
+			切换盒子函数
+			step 方向：up向上；down向下
+		*/
+		function changeBox(step, num=0){
+			// 暂停
+			video_boxes[index].querySelector("video").pause();
+			if(num > 0){												//这里有个大问题：从第三个点回第一个的时候只能先跳到第二个！！！
+				//点击左侧导航nav直接跳转至指定的视频
+				index = num;
+			}else{
+				if(step == "down"){
+					// 往下的时候
+					index = ++index >= box_length ? box_length : index;
+				}else{
+					// 往上的时候
+					index = --index <= 0 ? 0 : index;
+				}
+			}
+			var y = -1080*index;
+			document.querySelector(".container").style.transform = "translate(0,"+y+"px)";
+			video_boxes[index].querySelector("video").play();  // 这里如果是querySelectorAll就是数组了要加[0]
+
+			// 切换完成
+			isChange = false;
+		}
+
+		//键盘触发后的事件
+		function keyHandle(event){
+			console.log(event);
+			console.log('很高心见到大家！');
+
+			var step = "";
+			if(event.key == "ArrowDown"){
+				//往下的时候
+				step = "down";
+			}else if(event.key == "ArrowUp"){
+				//往上的时候
+				step = "up";
+			}
+			changeBox(step);
+		}
+
+		var isChange = false;
+		//滚轮触发后的事件
+		function scrollHandle(event){
+			console.log(event);
+			console.log(333);
+
+			var e = event || window.event;
+			var num = e.detail == 0 ? -e.wheelDelta : e.detail;
+			var step = "";
+			if(num > 0){
+				// 向下
+				step = "down";
+			}else{
+				// 向上
+				step = "up";
+			}
+			if(!isChange){
+				//如果没有切换盒子，那么就执行changeBox
+				setTimeout(function(){
+					changeBox(step);
+				},200);
+				//改变为正在切换
+				isChange = true;
+			}
+		}
+
+		function changeTo(index){
+			changeBox("", index);
+		}
+
+		window.addEventListener("keydown",keyHandle,true);
+
+		// 火狐
+		if(window.addEventListener("DOMMouseScroll",scrollHandle)){
+			window.addEventListener("DOMMouseScroll",scrollHandle,false);  // "mousewheel"是非FF的
+		}
+		// 360浏览器
+		window.onmousewheel = scrollHandle;
+
+	</script>
+</body>
+</html>
